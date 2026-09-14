@@ -20,7 +20,7 @@ def _load_cloud_init_template(os: str) -> dict:
         return yaml.safe_load(f)
 
 
-def _generate_cloud_init_with_password(os: str) -> dict:
+def _generate_cloud_init_with_password(os: str) -> str:
     template = _load_cloud_init_template(os)
 
     password = _generate_password()
@@ -32,7 +32,8 @@ def _generate_cloud_init_with_password(os: str) -> dict:
     template["chpasswd"]["expire"] = False
     template["ssh_pwauth"] = True
 
-    return template
+    template_str: str = yaml.dump(template)
+    return template_str
 
 
 def load_cloud_init_yaml(os: str) -> str | tuple[str, str]:
