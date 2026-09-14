@@ -1,14 +1,11 @@
-from app.tools.hosting import create_vm, VM_SCHEMA
+from app.tools.hosting import TOOLS_MAP as HOSTING_TOOLS_MAP, TOOLS_SCHEMA as HOSTING_TOOLS_SCHEMA
 
-# Combine them
-TOOLS_MAP = {
-    "create_vm": create_vm,
-}
+TOOLS_MAP: dict = {}
+TOOLS_MAP.update(HOSTING_TOOLS_MAP)
 
-# Combine schemas
-TOOLS_SCHEMA = [
-    VM_SCHEMA,
-]
+TOOLS_SCHEMA: dict = {}
+TOOLS_SCHEMA.update(HOSTING_TOOLS_SCHEMA)
+
 
 def execute_tool(tool_name: str, tool_args: dict):
     """Execute a tool by name"""
