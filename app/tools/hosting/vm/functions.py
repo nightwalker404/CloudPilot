@@ -16,7 +16,7 @@ def _sanitize_vm_name(name: str) -> str:
 def _incus_request(method: str, path: str, json: dict | None = None):
     response = requests.request(
         method,
-        f"{settings.INCUS_URL}{path}",
+        f"{settings.incus_url}{path}",
         cert=(str(settings.CLIENT_CERT), str(settings.CLIENT_KEY)),
         json=json,
         verify=str(settings.SERVER_CERT),
