@@ -21,7 +21,7 @@ def _generate_password(length: int = 16) -> str:
 def _incus_request(method: str, path: str, json: dict | None = None):
     response = requests.request(
         method,
-        f"https://127.0.0.1:8443{path}",
+        f"{settings.INCUS_URL}{path}",
         cert=(str(settings.CLIENT_CERT), str(settings.CLIENT_KEY)),
         json=json,
         verify=str(settings.SERVER_CERT),
