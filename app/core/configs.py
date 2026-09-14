@@ -1,10 +1,16 @@
 from functools import lru_cache
-
+from pathlib import Path
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
+    BASE_DIR = Path(__file__).resolve().parents[2]
+
+    ### Cert files
+    CLIENT_CERT = BASE_DIR / "certs" / "client.crt"
+    CLIENT_KEY = BASE_DIR / "certs" / "client.key"
+    
     ### App Configuration ###
     app_name: str = Field(..., validation_alias="APP_NAME")
     debug_mode: bool = Field(default=False, validation_alias="DEBUG_MODE")
