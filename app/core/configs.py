@@ -1,4 +1,5 @@
 from pydantic import BaseSettings, Field
+from functools import lru_cache
 
 class Settings(BaseSettings):
     app_name: str = Field(..., env="APP_NAME")
@@ -9,3 +10,7 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
+
+@lru_cache()
+def settings() -> Settings:
+    return Settings()
