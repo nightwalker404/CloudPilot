@@ -1,8 +1,22 @@
+import json
+import secrets
 import time
 import requests
+import string
 from app.core import get_settings
 
 settings = get_settings()
+
+import re
+
+def _sanitize_vm_name(name: str) -> str:
+    name = re.sub(r"[^a-zA-Z0-9-]", "-", name.strip())
+    name = re.sub(r"-+", "-", name).strip("-")
+    return name.lower()
+
+def _generate_password(length: int = 16) -> str:
+    alphabet = string.ascii_letters + string.digits
+    return "".join(secrets.choice(alphabet) for _ in range(length))
 
 def _incus_request(method: str, path: str, json: dict | None = None):
     response = requests.request(
@@ -10,37 +24,91 @@ def _incus_request(method: str, path: str, json: dict | None = None):
         f"https://127.0.0.1:8443{path}",
         cert=(str(settings.CLIENT_CERT), str(settings.CLIENT_KEY)),
         json=json,
-        verify=False,
+        verify=str(settings.SERVER_CERT),
     )
-    response.raise_for_status()
-    return response.json()
+    if not response.ok:
+        try:
+            detail = response.json().get("error", response.text)
+        except ValueError:
+            detail = response.text
+        raise RuntimeError(f"Incus request failed ({response.status_code}): {detail}")
+
+    data = response.json()
+    if data.get("type") == "error":
+        raise RuntimeError(f"Incus error: {data.get('error', 'unknown error')}")
+    return data
+
+def _wait_for_operation(operation_url: str, timeout: int = 60) -> dict:
+    result = _incus_request("GET", f"{operation_url}/wait?timeout={timeout}")
+    metadata = result.get("metadata") or {}
+    if metadata.get("status") != "Success":
+        err = metadata.get("err") or "unknown error"
+        raise RuntimeError(f"Incus operation failed: {err}")
+    return result
 
 def request_to_incus():
     return _incus_request("GET", "/1.0")
 
+def _get_instance_ip(vm_name: str, retries: int = 15, delay: int = 2) -> str | None:
+    for _ in range(retries):
+        state = _incus_request("GET", f"/1.0/instances/{vm_name}/state")
+        network = state.get("metadata", {}).get("network") or {}
+        for iface, data in network.items():
+            if iface == "lo":
+                continue
+            for addr in data.get("addresses", []):
+                if addr.get("family") == "inet":
+                    return addr.get("address")
+        time.sleep(delay)
+    return None
+
 def create_vm(cpu: int, memory: int, disk: int, vm_name: str = "", os: str = "ubuntu") -> str:
     """Create a virtual machine"""
-    if cpu < 1 or memory < 1 or disk < 1:
-        raise ValueError("cpu, memory and disk must all be positive")
-
+    for name, value in (("cpu", cpu), ("memory", memory), ("disk", disk)):
+        if not isinstance(value, (int, float)):
+            raise ValueError(f"{name} must be a number, got {type(value).__name__}: {value!r}")
+    
     if os not in ["ubuntu", "debian"]: # we will read this from db in future
         raise ValueError("os must be one of 'ubuntu', 'debian', or 'centos'")
 
+    os_label = os 
+    image_alias = "ubuntu:24.04" if os == "ubuntu" else os  
+
     if not vm_name.strip():
         vm_name = f"{os}-{time.strftime('%Y%m%d%H%M%S')}"
+    else:
+        vm_name = _sanitize_vm_name(vm_name)
+
+    username = os_label
+    password = _generate_password()
+
+    cloud_init_config = (
+    "#cloud-config\n"
+    "users:\n"
+    f"  - name: {username}\n"
+    "    sudo: ALL=(ALL) NOPASSWD:ALL\n"
+    "    lock_passwd: false\n"
+    "    shell: /bin/bash\n"
+    "chpasswd:\n"
+    "  list: |\n"
+    f"    {username}:{password}\n"
+    "  expire: false\n"
+    "ssh_pwauth: true\n"
+    )
 
     payload = {
         "name": vm_name,
         "type": "virtual-machine",
-        "source": {"type": "image", "alias": os},
+        "source": {"type": "image", "alias": image_alias},
         "config": {
             "limits.cpu": str(cpu),
             "limits.memory": f"{memory}GB",
+            "user.user-data": cloud_init_config,
         },
         "devices": {
             "root": {
                 "path": "/",
-                "pool": "default",  # adjust to your actual storage pool name
+                "pool": "default",
                 "type": "disk",
                 "size": f"{disk}GB",
             }
@@ -48,4 +116,16 @@ def create_vm(cpu: int, memory: int, disk: int, vm_name: str = "", os: str = "ub
     }
 
     result = _incus_request("POST", "/1.0/instances", json=payload)
-    return f"VM '{vm_name}' creation started — {cpu} vCPU, {memory}GB RAM, {disk}GB disk, {os}."
+    if operation_url := result.get("operation"):
+        _wait_for_operation(operation_url)
+
+    _incus_request("PUT", f"/1.0/instances/{vm_name}/state", json={"action": "start", "timeout": 30})
+
+    ip = _get_instance_ip(vm_name)
+
+    return (
+        f"VM '{vm_name}' created — {cpu} vCPU, {memory}GB RAM, {disk}GB disk, {os}.\n"
+        f"Username: {username}\n"
+        f"Password: {password}\n"
+        f"IP address: {ip or 'not assigned yet — check again shortly'}"
+    )
