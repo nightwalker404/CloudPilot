@@ -6,8 +6,6 @@ def load_prompt(version: str = "v1") -> list[dict]:
     """Load system prompt from prompt_{version}.json"""
     prompt_file = Path(__file__).parent / f"prompt_{version}.json"
 
-    print(f"Loading prompt from: {prompt_file}")
-
     if not prompt_file.exists():
         raise FileNotFoundError(f"Prompt file not found: {prompt_file}")
 
