@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     ### App Configuration ###
     app_name: str = Field(..., validation_alias="APP_NAME")
     debug_mode: bool = Field(default=False, validation_alias="DEBUG_MODE")
+    app_port: int = Field(..., validate_default="APP_PORT")
 
     ### AI Configuration ###
     model: str = Field(..., validation_alias="MODEL")
