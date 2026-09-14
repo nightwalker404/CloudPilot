@@ -1,9 +1,8 @@
-import json
-import secrets
 import time
 import requests
-import string
 from app.core import get_settings
+from .cloud_init.loader import load_cloud_init_yaml
+
 
 settings = get_settings()
 
@@ -13,10 +12,6 @@ def _sanitize_vm_name(name: str) -> str:
     name = re.sub(r"[^a-zA-Z0-9-]", "-", name.strip())
     name = re.sub(r"-+", "-", name).strip("-")
     return name.lower()
-
-def _generate_password(length: int = 16) -> str:
-    alphabet = string.ascii_letters + string.digits
-    return "".join(secrets.choice(alphabet) for _ in range(length))
 
 def _incus_request(method: str, path: str, json: dict | None = None):
     response = requests.request(
@@ -79,22 +74,8 @@ def create_vm(cpu: int, memory: int, disk: int, vm_name: str = "", os: str = "ub
     else:
         vm_name = _sanitize_vm_name(vm_name)
 
-    username = os_label
-    password = _generate_password()
-
-    cloud_init_config = (
-    "#cloud-config\n"
-    "users:\n"
-    f"  - name: {username}\n"
-    "    sudo: ALL=(ALL) NOPASSWD:ALL\n"
-    "    lock_passwd: false\n"
-    "    shell: /bin/bash\n"
-    "chpasswd:\n"
-    "  list: |\n"
-    f"    {username}:{password}\n"
-    "  expire: false\n"
-    "ssh_pwauth: true\n"
-    )
+    cloud_init_config, auth = load_cloud_init_yaml(os_label)
+    username, password = auth
 
     payload = {
         "name": vm_name,
