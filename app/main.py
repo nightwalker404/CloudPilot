@@ -1,11 +1,11 @@
-from core import get_logger, setup_logging
+from app.core import get_logger, setup_logging
 
 from ollama import Client
 
-from core import get_settings
-from prompts import load_prompt
-from tools import TOOLS_MAP, TOOLS_SCHEMA, execute_tool
-from services import extract_tool_call_from_content
+from app.core import get_settings
+from app.prompts import load_prompt
+from app.tools import TOOLS_MAP, TOOLS_SCHEMA, execute_tool
+from app.services import extract_tool_call_from_content
 
 setup_logging()
 logger = get_logger(__name__)
