@@ -14,6 +14,4 @@ def load_prompt(version: str = "v1") -> list[dict]:
     with open(prompt_file, "r", encoding="utf-8") as f:
         data = json.load(f)
 
-    print(f"Loaded prompt: {data}")
-
     return [data]
