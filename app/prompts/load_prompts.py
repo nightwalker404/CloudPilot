@@ -12,5 +12,3 @@ def load_prompt(version: str = "v1") -> dict:
         data = json.load(f)
     
     return data
-
-print(load_prompt("v1"))  # For testing purposes
