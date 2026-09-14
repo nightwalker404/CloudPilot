@@ -1,1 +1,1 @@
-from .load_prompts import load_prompts
+from .load_prompts import load_prompt
