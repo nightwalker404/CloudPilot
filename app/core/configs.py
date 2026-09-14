@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     ### Cert files
     CLIENT_CERT: Path = BASE_DIR / "certs" / "client.crt"
     CLIENT_KEY: Path = BASE_DIR / "certs" / "client.key"
+    SERVER_CERT: Path = BASE_DIR / "certs" / "server.crt"
     
     ### App Configuration ###
     app_name: str = Field(..., validation_alias="APP_NAME")
