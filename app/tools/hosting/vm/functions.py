@@ -105,8 +105,9 @@ def create_vm(cpu: int, memory: int, disk: int, vm_name: str = "", os: str = "ub
     ip = _get_instance_ip(vm_name)
 
     return (
-        f"VM '{vm_name}' created — {cpu} vCPU, {memory}GB RAM, {disk}GB disk, {os}.\n"
-        f"Username: {username}\n"
-        f"Password: {password}\n"
-        f"IP address: {ip or 'not assigned yet — check again shortly'}"
+        f"✅ VM '{vm_name}' created successfully!\n"
+        f"   OS: {os}   •   CPU: {cpu} vCPU   •   RAM: {memory}GB   •   Disk: {disk}GB\n"
+        f"   Username: {username}\n"
+        f"   Password: {password}\n"
+        f"   IP: {ip or 'not assigned yet — check again shortly'}"
     )
