@@ -1,4 +1,4 @@
-from app.tools.hosting import create_vm, VM_SCHEMA
+from .vm import create_vm, VM_SCHEMA
 
 # Combine them
 TOOLS_MAP = {
