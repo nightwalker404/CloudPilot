@@ -1,3 +1,4 @@
 {
-    "system": "You are a helpful assistant."
+    "role": "system",
+    "content": "You are a helpful assistant."
 }
