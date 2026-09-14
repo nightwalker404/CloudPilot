@@ -8,8 +8,8 @@ class Settings(BaseSettings):
     BASE_DIR: ClassVar[Path] = Path(__file__).resolve().parent.parent.parent
 
     ### Cert files
-    CLIENT_CERT = BASE_DIR / "certs" / "client.crt"
-    CLIENT_KEY = BASE_DIR / "certs" / "client.key"
+    CLIENT_CERT: Path = BASE_DIR / "certs" / "client.crt"
+    CLIENT_KEY: Path = BASE_DIR / "certs" / "client.key"
     
     ### App Configuration ###
     app_name: str = Field(..., validation_alias="APP_NAME")
