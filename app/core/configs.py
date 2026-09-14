@@ -2,10 +2,10 @@ from functools import lru_cache
 from pathlib import Path
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
-
+from typing import ClassVar
 
 class Settings(BaseSettings):
-    BASE_DIR = Path(__file__).resolve().parents[2]
+    BASE_DIR: ClassVar[Path] = Path(__file__).resolve().parent.parent.parent
 
     ### Cert files
     CLIENT_CERT = BASE_DIR / "certs" / "client.crt"
