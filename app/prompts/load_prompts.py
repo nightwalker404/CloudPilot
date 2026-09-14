@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-def load_prompt(version: str = "v1") -> str:
+def load_prompt(version: str = "v1") -> dict:
     """Load system prompt from prompt_{version}.json"""
     prompt_file = Path(__file__).parent / f"prompt_{version}.json"
     
@@ -11,4 +11,6 @@ def load_prompt(version: str = "v1") -> str:
     with open(prompt_file, "r", encoding="utf-8") as f:
         data = json.load(f)
     
-    return data["system"]
+    return data
+
+print(load_prompt("v1"))  # For testing purposes
