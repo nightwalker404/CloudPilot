@@ -41,7 +41,7 @@ class MongoConversationStore:
         return self._db
 
     async def create(self, user_id: str, title: str = "New Conversation", model: Optional[str] = None) -> MongoConversation:
-        now = datetime.utcnow()
+        now = datetime.now()
         doc = {
             "user_id": user_id,
             "title": title,
