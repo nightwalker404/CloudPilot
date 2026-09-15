@@ -23,11 +23,11 @@ front_app/.git
 front_app/.dockerignore
 front_app/Dockerfile
 front_app/nginx.conf
-certs/*.crt
-certs/*.key
+# certs/*.crt
+# certs/*.key
 !.gitkeep
 .git
 .vscode
 .idea
 *.swp
-*.swo
+*.swoa
