@@ -1,0 +1,14 @@
+use_default_settings: true
+
+general:
+  instance_name: "CloudPilot SearXNG"
+
+search:
+  safe_search: 0
+  formats:
+    - html
+    - json
+
+server:
+  limiter: false
+  image_proxy: false
