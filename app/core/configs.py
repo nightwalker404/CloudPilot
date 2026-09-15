@@ -4,19 +4,38 @@ from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import ClassVar
 
+
 class Settings(BaseSettings):
     BASE_DIR: ClassVar[Path] = Path(__file__).resolve().parent.parent.parent
 
-    ### Cert files
-    CLIENT_CERT: Path = BASE_DIR / "certs" / "client.crt"
-    CLIENT_KEY: Path = BASE_DIR / "certs" / "client.key"
-    SERVER_CERT: Path = BASE_DIR / "certs" / "server.crt"
-    
+    ### Cert files (configurable for Docker)
+    client_cert_path: str = Field(default="", validation_alias="CLIENT_CERT_PATH")
+    client_key_path: str = Field(default="", validation_alias="CLIENT_KEY_PATH")
+    server_cert_path: str = Field(default="", validation_alias="SERVER_CERT_PATH")
+
+    @property
+    def CLIENT_CERT(self) -> Path:
+        if self.client_cert_path:
+            return Path(self.client_cert_path)
+        return self.BASE_DIR / "certs" / "client.crt"
+
+    @property
+    def CLIENT_KEY(self) -> Path:
+        if self.client_key_path:
+            return Path(self.client_key_path)
+        return self.BASE_DIR / "certs" / "client.key"
+
+    @property
+    def SERVER_CERT(self) -> Path:
+        if self.server_cert_path:
+            return Path(self.server_cert_path)
+        return self.BASE_DIR / "certs" / "server.crt"
+
     ### App Configuration ###
     app_name: str = Field(..., validation_alias="APP_NAME")
     debug_mode: bool = Field(default=False, validation_alias="DEBUG_MODE")
-    app_port: int = Field(..., validate_default="APP_PORT")
-    app_host: str = Field(..., validate_default="APP_HOST")
+    app_port: int = Field(..., validation_alias="APP_PORT")
+    app_host: str = Field(..., validation_alias="APP_HOST")
 
     ### AI Configuration ###
     model: str = Field(..., validation_alias="MODEL")
