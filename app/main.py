@@ -1,15 +1,9 @@
-from app.core import get_logger, setup_logging
+from app.core import get_logger, setup_logging, get_settings
 from ollama import Client
-from app.core import get_settings
-from app.prompts import load_prompt
-from app.tools import TOOLS_MAP, TOOLS_SCHEMA
-
-from .tools import dispatcher
-
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 import uvicorn
-from app.routers import router as app_router
+from app.routers import api_router
 
 logger = get_logger(__name__)
 
@@ -35,7 +29,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
         
 
-app.include_router(app_router.router)
+app.include_router(api_router)
 
 
 @app.get("/health")
