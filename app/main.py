@@ -1,62 +1,52 @@
 from app.core import get_logger, setup_logging
-
 from ollama import Client
-
 from app.core import get_settings
 from app.prompts import load_prompt
-from app.tools import TOOLS_MAP, TOOLS_SCHEMA, execute_tool
-from app.services import extract_tool_call_from_content
+from app.tools import TOOLS_MAP, TOOLS_SCHEMA
 
-setup_logging()
+from .tools import dispatcher
+
+from fastapi import FastAPI
+from contextlib import asynccontextmanager
+import uvicorn
+from app.routers import router as app_router
+
 logger = get_logger(__name__)
 
-settings = get_settings()
-client = Client(host=settings.llm_base_url)
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    logger.info("Starting up application...")
+    setup_logging()
+
+    settings = get_settings()
+
+    client = Client(host=settings.llm_base_url)
+    logger.info(f"Connected to LLM at {settings.llm_base_url}")
+    
+    # Store in app state for use in routes
+    app.state.llm_client = client
+    app.state.settings = settings
+    
+    yield
+    
+    logger.info("Shutting down application...")
+    logger.info("Application shut down successfully")
+
+app = FastAPI(lifespan=lifespan)
+        
+
+app.include_router(app_router.router)
 
 
-def main():
-    messages = load_prompt("v2")
-
-    while True:
-        user_input = input("User: ")
-
-        if user_input.lower() in ["exit", "quit"]:
-            print("Exiting...")
-            break
-
-        messages.append({
-            "role": "user",
-            "content": user_input,
-        })
-
-        response = client.chat(
-            model=settings.model,
-            messages=messages,
-            stream=False,
-            tools=TOOLS_SCHEMA
-        )
-
-        assistant_message = response["message"]
-
-        if assistant_message.get("tool_calls"):
-            messages.append(assistant_message)
-            for tool_call in assistant_message["tool_calls"]:
-                tool_name = tool_call["function"]["name"]
-                tool_args = tool_call["function"]["arguments"]
-                result = execute_tool(tool_name, tool_args)
-                messages.append({"role": "tool", "content": str(result)})
-        else:
-            content = assistant_message["content"]
-            parsed = extract_tool_call_from_content(content)
-            if parsed:
-                messages.append({"role": "assistant", "content": content})
-                result = execute_tool(parsed["name"], parsed["arguments"])
-                messages.append({"role": "tool", "content": str(result)})
-            else:
-                result = content
-                messages.append({"role": "assistant", "content": content})
-
-        print(f"AI: {result}")
+@app.get("/health")
+async def home():
+    return {"status": "healthy"}
 
 if __name__ == "__main__":
-    main()
+    settings = get_settings()
+    uvicorn.run(
+        app=app,
+        host=settings.app_host,
+        port=settings.app_port,
+        log_level="info"
+    )
