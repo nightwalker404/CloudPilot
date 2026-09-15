@@ -33,6 +33,21 @@ services:
       - cloudpilot-net
     restart: unless-stopped
 
+  searxng:
+    image: docker.io/searxng/searxng:latest
+    container_name: cloudpilot-searxng
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./searxng:/etc/searxng:rw
+      - ./searxng-cache:/var/cache/searxng:rw
+    environment:
+      - SEARXNG_BASE_URL=http://localhost:8080/
+      - SEARXNG_SECRET=change-this-to-a-random-secret
+    restart: unless-stopped
+    networks:
+      - cloudpilot-net
+
   backend:
     build:
       context: .
