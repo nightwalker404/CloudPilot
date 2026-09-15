@@ -29,7 +29,7 @@ class Settings(BaseSettings):
     mongo_db_name: str = Field(default="cloudpilot", validation_alias="MONGO_DB_NAME")
 
     ### Incus Configuration ###
-    incus_url: str = Field(..., validation_alias="INCUS_URL")
+    incus_url: str = Field(default="https://host.docker.internal:8443", validation_alias="INCUS_URL")
 
     ### Web Search Configuration ###
     tavily_api_key: str = Field(default="", validation_alias="TAVILY_API_KEY")
