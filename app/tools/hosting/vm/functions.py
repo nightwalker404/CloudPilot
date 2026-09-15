@@ -15,11 +15,11 @@ def _sanitize_vm_name(name: str) -> str:
 
 def _validate_vm_params(cpu: int, memory: int, disk: int):
     if not isinstance(cpu, int) or cpu < 1 or cpu > 64:
-        raise ValueError("cpu must be an integer between 1 and 64")
+        raise ValueError(f"cpu must be an integer between 1 and 64:\ncpu type now: {type0}")
     if not isinstance(memory, int) or memory < 1 or memory > 512:
-        raise ValueError("memory must be an integer between 1 and 512 GB")
+        raise ValueError(f"memory must be an integer between 1 and 512 GB:\nmemory type now: {type0}")
     if not isinstance(disk, int) or disk < 10 or disk > 2000:
-        raise ValueError("disk must be an integer between 10 and 2000 GB")
+        raise ValueError(f"disk must be an integer between 10 and 2000 GB:\ndisk type now: {type0}")
 
 def _incus_request(method: str, path: str, json: dict | None = None):
     response = requests.request(
@@ -27,7 +27,8 @@ def _incus_request(method: str, path: str, json: dict | None = None):
         f"{settings.incus_url}{path}",
         cert=(str(settings.CLIENT_CERT), str(settings.CLIENT_KEY)),
         json=json,
-        verify=str(settings.SERVER_CERT),
+        # verify=str(settings.SERVER_CERT),
+        verify=False
     )
     if not response.ok:
         try:
