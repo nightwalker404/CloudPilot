@@ -5,6 +5,7 @@ from fastapi import FastAPI
 from contextlib import asynccontextmanager
 import uvicorn
 from app.routers import api_router
+from fastapi.middleware.cors import CORSMiddleware
 
 logger = get_logger(__name__)
 
@@ -40,6 +41,15 @@ app.include_router(api_router)
 @app.get("/health")
 async def home():
     return {"status": "healthy"}
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 if __name__ == "__main__":
     settings = get_settings()
