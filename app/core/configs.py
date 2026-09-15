@@ -31,6 +31,9 @@ class Settings(BaseSettings):
     ### Incus Configuration ###
     incus_url: str = Field(..., validation_alias="INCUS_URL")
 
+    ### Web Search Configuration ###
+    tavily_api_key: str = Field(default="", validation_alias="TAVILY_API_KEY")
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",

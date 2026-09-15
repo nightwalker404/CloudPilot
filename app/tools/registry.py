@@ -1,17 +1,20 @@
 from .hosting import TOOLS_MAP as HOSTING_TOOLS_MAP, TOOLS_SCHEMA as HOSTING_TOOLS_SCHEMA
+from .websearch import TOOLS_MAP as WEBSEARCH_TOOLS_MAP, TOOLS_SCHEMA as WEBSEARCH_TOOLS_SCHEMA
 
 TOOLS_MAP: dict = {}
 TOOLS_MAP.update(HOSTING_TOOLS_MAP)
+TOOLS_MAP.update(WEBSEARCH_TOOLS_MAP)
 
 TOOLS_SCHEMA: list = []
 TOOLS_SCHEMA.extend(HOSTING_TOOLS_SCHEMA)
+TOOLS_SCHEMA.extend(WEBSEARCH_TOOLS_SCHEMA)
 
 
 def execute_tool(tool_name: str, tool_args: dict):
     """Execute a tool by name"""
     if tool_name not in TOOLS_MAP:
         return f"Error: Unknown tool {tool_name}"
-    
+
     try:
         tool_func = TOOLS_MAP[tool_name]
         result = tool_func(**tool_args)
