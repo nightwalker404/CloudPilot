@@ -63,8 +63,8 @@ def create_vm(cpu: int, memory: int, disk: int, vm_name: str = "", os: str = "ub
         if not isinstance(value, (int, float)):
             raise ValueError(f"{name} must be a number, got {type(value).__name__}: {value!r}")
     
-    if os not in ["ubuntu", "debian"]: # we will read this from db in future
-        raise ValueError("os must be one of 'ubuntu', 'debian', or 'centos'")
+    if not os or os not in ["ubuntu", "debian"]:
+        os = "ubuntu"
 
     os_label = os 
     image_alias = "ubuntu:24.04" if os == "ubuntu" else os  
