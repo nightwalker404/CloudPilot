@@ -1,4 +1,5 @@
 from app.core import get_logger, setup_logging, get_settings
+from app.core.mongodb import connect_to_mongo, close_mongo_connection
 from ollama import Client
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
@@ -14,6 +15,9 @@ async def lifespan(app: FastAPI):
 
     settings = get_settings()
 
+    await connect_to_mongo()
+    logger.info("Connected to MongoDB")
+    
     client = Client(host=settings.llm_base_url)
     logger.info(f"Connected to LLM at {settings.llm_base_url}")
     
@@ -24,6 +28,7 @@ async def lifespan(app: FastAPI):
     yield
     
     logger.info("Shutting down application...")
+    await close_mongo_connection()
     logger.info("Application shut down successfully")
 
 app = FastAPI(lifespan=lifespan)
