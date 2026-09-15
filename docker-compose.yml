@@ -15,6 +15,8 @@ services:
             - driver: nvidia
               count: all
               capabilities: [gpu]
+    networks:
+      - cloudpilot-net
     restart: unless-stopped
 
   mongodb:
@@ -27,6 +29,8 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
     volumes:
       - mongodb_data:/data/db
+    networks:
+      - cloudpilot-net
     restart: unless-stopped
 
   backend:
@@ -53,18 +57,26 @@ services:
     depends_on:
       - ollama
       - mongodb
+    networks:
+      - cloudpilot-net
     restart: unless-stopped
 
-  # frontend:
-  #   build:
-  #     context: ./front_app_v3
-  #     dockerfile: Dockerfile
-  #   container_name: cloudpilot-frontend2
-  #   ports:
-  #     - "3000:80"
-  #   depends_on:
-  #     - backend
-  #   restart: unless-stopped
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: cloudpilot-frontend2
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - cloudpilot-net
+    restart: unless-stopped
 
 volumes:
   mongodb_data:
+
+networks:
+  cloudpilot-net:
+    driver: bridge
