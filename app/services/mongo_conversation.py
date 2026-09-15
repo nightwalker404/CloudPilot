@@ -68,7 +68,7 @@ class MongoConversationStore:
     async def add_message(self, conversation_id: str, user_id: str, message: Message) -> bool:
         result = await self.db.conversations.find_one_and_update(
             {"_id": ObjectId(conversation_id), "user_id": user_id},
-            {"$push": {"messages": message.model_dump()}, "$set": {"updated_at": datetime.utcnow()}},
+            {"$push": {"messages": message.model_dump()}, "$set": {"updated_at": datetime.cnow()}},
             return_document=ReturnDocument.AFTER
         )
         return result is not None
@@ -78,7 +78,7 @@ class MongoConversationStore:
             return True
         result = await self.db.conversations.find_one_and_update(
             {"_id": ObjectId(conversation_id), "user_id": user_id},
-            {"$push": {"messages": {"$each": [m.model_dump() for m in messages]}}, "$set": {"updated_at": datetime.utcnow()}},
+            {"$push": {"messages": {"$each": [m.model_dump() for m in messages]}}, "$set": {"updated_at": datetime.now()}},
             return_document=ReturnDocument.AFTER
         )
         return result is not None
@@ -86,7 +86,7 @@ class MongoConversationStore:
     async def replace_messages(self, conversation_id: str, user_id: str, messages: List[Message]) -> bool:
         result = await self.db.conversations.find_one_and_update(
             {"_id": ObjectId(conversation_id), "user_id": user_id},
-            {"$set": {"messages": [m.model_dump() for m in messages], "updated_at": datetime.utcnow()}},
+            {"$set": {"messages": [m.model_dump() for m in messages], "updated_at": datetime.now()}},
             return_document=ReturnDocument.AFTER
         )
         return result is not None
