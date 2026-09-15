@@ -92,16 +92,7 @@ async def llm_service(
     else:
         new_messages = messages + [_dict_to_message(msg) for msg in result]
     
-    # Determine final message history to save
-    if conversation_id:
-        existing = await conversation_store.get(conversation_id, user_id)
-        if existing:
-            # Append new messages to existing history
-            all_messages = existing.messages + new_messages
-        else:
-            all_messages = new_messages
-    else:
-        all_messages = new_messages
+    all_messages = new_messages
     
     # Save conversation
     if conversation_id:
