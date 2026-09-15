@@ -19,3 +19,4 @@ def dispatcher(assistant_message, messages):
         else:
             result = content
             messages.append({"role": "assistant", "content": content})
+    return result
