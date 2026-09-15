@@ -54,9 +54,6 @@ services:
       - INCUS_URL=https://172.17.0.1:8443
       - APP_HOST=0.0.0.0
       - APP_PORT=8000
-      # SSL verification for Incus (self-signed)
-      - REQUESTS_CA_BUNDLE=/app/certs/incus.crt
-      - SSL_CERT_FILE=/app/certs/incus.crt
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
