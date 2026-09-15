@@ -55,16 +55,16 @@ services:
       - mongodb
     restart: unless-stopped
 
-  frontend:
-    build:
-      context: ./front_app
-      dockerfile: Dockerfile
-    container_name: cloudpilot-frontend
-    ports:
-      - "3000:80"
-    depends_on:
-      - backend
-    restart: unless-stopped
+  # frontend:
+  #   build:
+  #     context: ./front_app_v3
+  #     dockerfile: Dockerfile
+  #   container_name: cloudpilot-frontend2
+  #   ports:
+  #     - "3000:80"
+  #   depends_on:
+  #     - backend
+  #   restart: unless-stopped
 
 volumes:
   mongodb_data:
