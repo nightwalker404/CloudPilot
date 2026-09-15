@@ -11,3 +11,6 @@ __pycache__/
 # certificates
 *.key
 *.crt
+
+# local frontend
+front_app
