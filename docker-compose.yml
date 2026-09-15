@@ -19,8 +19,52 @@ services:
 
   mongodb:
     image: mongo:latest
+    container_name: mongodb
     ports:
       - "27017:27017"
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+    volumes:
+      - mongodb_data:/data/db
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cloudpilot-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - APP_NAME=CloudPilot
+      - DEBUG_MODE=True
+      - MODEL=qwen2.5-coder:1.5b
+      - LLM_BASE_URL=http://ollama:11434
+      - MONGO_URI=mongodb://admin:password@mongodb:27017
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=password
+      - MONGO_DB_NAME=cloudpilot
+      - INCUS_URL=https://127.0.0.1:8443
+      - APP_HOST=0.0.0.0
+      - APP_PORT=8000
+    volumes:
+      - ./certs:/app/certs:ro
+    depends_on:
+      - ollama
+      - mongodb
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./front_app
+      dockerfile: Dockerfile
+    container_name: cloudpilot-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  mongodb_data:
