@@ -2,6 +2,8 @@ from app.tools.registry import execute_tool
 
 def dispatcher(assistant_message, messages):
     from app.services.llm_response import extract_tool_call_from_content
+    messages = list(messages)
+    
     if assistant_message.get("tool_calls"):
         messages.append(assistant_message)
         for tool_call in assistant_message["tool_calls"]:
