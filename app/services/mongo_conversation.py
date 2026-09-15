@@ -68,7 +68,7 @@ class MongoConversationStore:
     async def add_message(self, conversation_id: str, user_id: str, message: Message) -> bool:
         result = await self.db.conversations.find_one_and_update(
             {"_id": ObjectId(conversation_id), "user_id": user_id},
-            {"$push": {"messages": message.model_dump()}, "$set": {"updated_at": datetime.cnow()}},
+            {"$push": {"messages": message.model_dump()}, "$set": {"updated_at": datetime.now()}},
             return_document=ReturnDocument.AFTER
         )
         return result is not None
