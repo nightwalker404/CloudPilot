@@ -51,7 +51,7 @@ class Settings(BaseSettings):
     incus_url: str = Field(default="https://host.docker.internal:8443", validation_alias="INCUS_URL")
 
     ### Web Search Configuration ###
-    tavily_api_key: str = Field(default="", validation_alias="TAVILY_API_KEY")
+    searxng_url: str = Field(default="http://searxng:8080", validation_alias="SEARXNG_URL")
 
     model_config = SettingsConfigDict(
         env_file=".env",
