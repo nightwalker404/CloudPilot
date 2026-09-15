@@ -24,7 +24,7 @@ def extract_tool_call_from_content(content: str) -> dict | None:
 
     return None
 
-def llm_service(prompt: str, request: Request):
+def llm_service(prompt: str, request: Request) -> str:
     messages = load_prompt("v2")
     messages.append({
         "role": "user",
