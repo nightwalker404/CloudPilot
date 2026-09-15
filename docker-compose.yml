@@ -49,9 +49,11 @@ services:
       - MONGO_INITDB_ROOT_USERNAME=admin
       - MONGO_INITDB_ROOT_PASSWORD=password
       - MONGO_DB_NAME=cloudpilot
-      - INCUS_URL=https://127.0.0.1:8443
+      - INCUS_URL=https://172.17.0.1:8443
       - APP_HOST=0.0.0.0
       - APP_PORT=8000
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
       - ./certs:/app/certs:ro
     depends_on:
