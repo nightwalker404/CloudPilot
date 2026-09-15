@@ -26,6 +26,7 @@ class Settings(BaseSettings):
     mongo_uri: str = Field(..., validation_alias="MONGO_URI")
     mongo_initdb_root_username: str = Field(..., validation_alias="MONGO_INITDB_ROOT_USERNAME")
     mongo_initdb_root_password: str = Field(..., validation_alias="MONGO_INITDB_ROOT_PASSWORD")
+    mongo_db_name: str = Field(default="cloudpilot", validation_alias="MONGO_DB_NAME")
 
     ### Incus Configuration ###
     incus_url: str = Field(..., validation_alias="INCUS_URL")
