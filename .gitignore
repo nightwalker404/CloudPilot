@@ -11,3 +11,9 @@ __pycache__/
 # certificates
 *.key
 *.crt
+
+# zip files
+*.zip
+
+# text files
+*.txt
