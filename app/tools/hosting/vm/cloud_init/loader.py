@@ -20,7 +20,8 @@ def _load_cloud_init_template(os: str) -> dict:
         return yaml.safe_load(f)
 
 
-def _generate_cloud_init_with_password(os: str) -> str:
+def _generate_cloud_init_with_password(os: str) -> tuple[str, str]:
+    """Returns (cloud_init_yaml, password)"""
     template = _load_cloud_init_template(os)
 
     password = _generate_password()
@@ -33,9 +34,10 @@ def _generate_cloud_init_with_password(os: str) -> str:
     template["ssh_pwauth"] = True
 
     template_str: str = yaml.dump(template)
-    return template_str
+    return template_str, password
 
 
-def load_cloud_init_yaml(os: str) -> str | tuple[str, str]:
-    cloud_init_yaml = _generate_cloud_init_with_password(os)
-    return cloud_init_yaml, (os, _generate_password())
+def load_cloud_init_yaml(os: str) -> tuple[str, str]:
+    """Returns (cloud_init_yaml, (username, password))"""
+    cloud_init_yaml, password = _generate_cloud_init_with_password(os)
+    return cloud_init_yaml, (os, password)
