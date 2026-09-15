@@ -1,1 +1,1 @@
-from .router import router as api_router
+from .chat import router as api_router
